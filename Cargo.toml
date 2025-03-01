@@ -27,3 +27,4 @@ path = "src/bin/benchmarks/time.rs"
 
 [dependencies]
 getopts = "0.2"
+rand = "0.9"
