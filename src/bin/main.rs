@@ -19,8 +19,9 @@ fn main() {
     opts.optflag("g", "gpu", "Benchmarks GPU usage");
     opts.optflag("p", "processes", "something children processes?");
     opts.optflag("s", "sys", "Track all syscalls");
-    opts.optflag("f", "full", "Benchmark everything")
+    opts.optflag("f", "full", "Benchmark everything");
 
+    println!("Running thingy");
 
 
     let matches = match opts.parse(&args[1..]) {

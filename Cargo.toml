@@ -3,5 +3,27 @@ name = "super-duper-memory"
 version = "0.1.0"
 edition = "2024"
 
+# all of the separate bins will be diff executables for benchmarking, 
+# but I really dont just want them all in the bin folder, so I will also define them here
+# Usage becomes: cargo run --bin [benchmark name]
+# which will eventually be some actual build command to a separate build dir from a script, that we can then 
+# call from another script.
+
+[[bin]]
+name = "main"
+path = "src/bin/main.rs"
+
+[[bin]]
+name = "disk"
+path = "src/bin/benchmarks/disk.rs"
+
+[[bin]]
+name = "memory"
+path = "src/bin/benchmarks/memory.rs"
+
+[[bin]]
+name = "time"
+path = "src/bin/benchmarks/time.rs"
+
 [dependencies]
 getopts = "0.2"
