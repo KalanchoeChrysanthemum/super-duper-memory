@@ -1,3 +1,3 @@
 pub fn main(){
-    println!("Running disk benchmark");
+    println!("[INFO] Running disk benchmark");
 }

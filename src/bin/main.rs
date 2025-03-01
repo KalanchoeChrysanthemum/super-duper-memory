@@ -4,34 +4,43 @@ use getopts::Options;
 use std::env;
 
 fn main() {
+    println!("[INFO] Running main.rs");
+
     let args: Vec<String> = env::args().collect();
     let ref _prog = args[0];
 
-    let mut opts = Options::new();
+    let mut flags = Options::new();
+    set_flags(&mut flags);
 
-    // Opt flags
-    opts.optflag("h", "hello", "prints hello world");
-    opts.optflag("t", "time", "Benchmarks time");
-    opts.optflag("m", "memory", "Benchmarks memory");
-    opts.optflag("d", "disk", "Benchmarks disk usage");
-    opts.optflag("r", "ram", "Benchmarks RAM usage");
-    opts.optflag("c", "cpu", "Benchmarks CPU usage");
-    opts.optflag("g", "gpu", "Benchmarks GPU usage");
-    opts.optflag("p", "processes", "something children processes?");
-    opts.optflag("s", "sys", "Track all syscalls");
-    opts.optflag("f", "full", "Benchmark everything");
-
-    println!("Running thingy");
-
-
-    let matches = match opts.parse(&args[1..]) {
-        Ok(m) => m,
-        Err(f) => {
-            panic!("{}", f.to_string());
+    let opts = match flags.parse(&args[1..]) {
+        Ok(o) => o,
+        Err(e) => {
+            panic!("[ERROR] {}", e.to_string());
         }
     };
 
-    if matches.opt_present("h") {
-        println!("Hello, World!");
+    if opts.opt_present("test") {
+        temp_test(&opts.opt_str("test").unwrap());
     }
+}
+
+// Temporary function for testing purposes
+// put (program under test)
+fn temp_test(put: &str) {
+    println!("[INFO] Test ran with '{}'", put);
+}
+
+fn set_flags(flags: &mut Options) {
+    // Temp flag for testing purposes
+    flags.optopt("", "test", "placeholder testing flag", "EXE");
+
+    flags.optflag("t", "time", "Benchmarks time");
+    flags.optflag("m", "memory", "Benchmarks memory");
+    flags.optflag("d", "disk", "Benchmarks disk usage");
+    flags.optflag("r", "ram", "Benchmarks RAM usage");
+    flags.optflag("c", "cpu", "Benchmarks CPU usage");
+    flags.optflag("g", "gpu", "Benchmarks GPU usage");
+    flags.optflag("p", "processes", "something children processes?");
+    flags.optflag("s", "sys", "Track all syscalls");
+    flags.optflag("f", "full", "Benchmark everything");
 }

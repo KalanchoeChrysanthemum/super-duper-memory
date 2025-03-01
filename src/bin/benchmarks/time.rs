@@ -1,3 +1,3 @@
 pub fn main(){
-    println!("Running time benchmark");
+    println!("[INFO] Running time benchmark");
 }
