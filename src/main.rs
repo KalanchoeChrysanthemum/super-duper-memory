@@ -11,6 +11,16 @@ fn main() {
 
     // Opt flags
     opts.optflag("h", "hello", "prints hello world");
+    opts.optflag("t", "time", "Benchmarks time");
+    opts.optflag("m", "memory", "Benchmarks memory");
+    opts.optflag("d", "disk", "Benchmarks disk usage");
+    opts.optflag("r", "ram", "Benchmarks RAM usage");
+    opts.optflag("c", "cpu", "Benchmarks CPU usage");
+    opts.optflag("g", "gpu", "Benchmarks GPU usage");
+    opts.optflag("p", "processes", "something children processes?");
+    opts.optflag("s", "sys", "Track all syscalls");
+
+
 
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => m,
