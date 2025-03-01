@@ -1,5 +1,5 @@
 /target
 
-# benchmark executables dir
-# TODO set up build pipeline for this at some point
+# benchmark executables dirs
+/build-tmp
 /bin
