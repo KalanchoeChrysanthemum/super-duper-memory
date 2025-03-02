@@ -25,6 +25,12 @@ path = "src/bin/benchmarks/memory.rs"
 name = "time"
 path = "src/bin/benchmarks/time.rs"
 
+[[bin]]
+name = "cpu"
+path = "src/bin/benchmarks/cpu.rs"
+
+
 [dependencies]
 getopts = "0.2"
 rand = "0.9"
+rayon = "1.10.0"
