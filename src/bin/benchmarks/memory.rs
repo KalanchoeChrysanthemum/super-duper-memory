@@ -7,7 +7,6 @@ pub fn main(){
     let mut fill_me: Vec<i128> = vec![];
     // should be 8 gigs if im understanding this
 
-
     let size: i128 = 1024 * 1024 * 256; 
 
     // filll with 2 gigs
