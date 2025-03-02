@@ -1,7 +1,6 @@
 use rand::Rng;
 use std::{
-    fs::{File, create_dir_all, remove_dir_all},
-    io::Write,
+    alloc::System, fs::{create_dir_all, remove_dir_all, File}, io::Write
 };
 
 pub fn main() {
@@ -9,12 +8,20 @@ pub fn main() {
 
     if create_dir_all("tmp").is_err() {
         println!("oopsies could not create tmp dir");
+        cleanup();
     }
 
     let filename = "dummy_data.txt";
     let path = format!("tmp/{}", filename);
 
-    let mut f = File::create(path).expect("oopsies couldn't makes file");
+    let mut f = match File::create(path) {
+        Ok(f) => f,
+        Err(_) => {
+            println!("oopsies could not create file");
+            cleanup();
+            return ();// gotta be a better way to handle this buttttt
+        }
+    };
 
     let num_chars_to_write = 3_000_000;
 
@@ -36,4 +43,8 @@ fn cleanup() {
     if remove_dir_all("tmp").is_err() {
         println!("oopsies could not clean tmp dir");
     }
+
+    println!("Finished memory benchmark");
+
+    std::process::exit(0);
 }
