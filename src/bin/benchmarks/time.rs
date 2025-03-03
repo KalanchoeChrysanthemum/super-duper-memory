@@ -1,6 +1,6 @@
 use std::{thread, time};
 
-pub fn main(){
+pub fn main() {
     println!("Running time benchmark");
 
     sleep_for_seconds(4);
@@ -14,11 +14,8 @@ pub fn main(){
 
     sleep_for_seconds(3);
     sleep_for_seconds(1);
-
 }
 
-
-
-fn sleep_for_seconds(secs: u64){
+fn sleep_for_seconds(secs: u64) {
     thread::sleep(time::Duration::from_secs(secs));
 }
