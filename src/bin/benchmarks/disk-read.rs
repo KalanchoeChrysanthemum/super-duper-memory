@@ -1,6 +1,9 @@
-use std::{fs, io::{BufReader, Read}};
+use std::{
+    fs,
+    io::{BufReader, Read},
+};
 
-pub fn main(){
+pub fn main() {
     println!("Running disk-read benchmark");
 
     // im just using dev random, because I didn't wanna have to write to a new file first
@@ -11,9 +14,10 @@ pub fn main(){
 
     let mut reader = BufReader::new(file);
     // read 3 gigs from fs into memory
-    let mut buffer = vec![0; 1024 * 1024 * 1024 * 3]; 
+    let mut buffer = vec![0; 1024 * 1024 * 1024 * 3];
 
-    reader.read_exact(&mut buffer).expect("Could not read bytes");
+    reader
+        .read_exact(&mut buffer)
+        .expect("Could not read bytes");
     println!("Finished disk-read benchmark");
-
 }
