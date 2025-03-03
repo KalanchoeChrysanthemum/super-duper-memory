@@ -37,6 +37,10 @@ path = "src/bin/benchmarks/disk-read.rs"
 name = "disk-write"
 path = "src/bin/benchmarks/disk-write.rs"
 
+[[bin]]
+name = "child-procs"
+path = "src/bin/benchmarks/child-procs.rs"
+
 
 [dependencies]
 getopts = "0.2"
