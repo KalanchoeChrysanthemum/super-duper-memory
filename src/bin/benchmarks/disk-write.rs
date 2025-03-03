@@ -1,6 +1,6 @@
 use rand::Rng;
 use std::{
-    alloc::System, fs::{create_dir_all, remove_dir_all, File}, io::Write
+    fs::{create_dir_all, remove_dir_all, File}, io::Write
 };
 
 pub fn main() {

@@ -1,5 +1,4 @@
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use std::time::Instant;
 
 fn main() {
     println!("Running CPU benchmark");

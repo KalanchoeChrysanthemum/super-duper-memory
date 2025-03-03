@@ -1,5 +1,5 @@
 #!/bin/bash
-# crazy bash build script :0
+# crazy parallel bash build script :0
 
 # make if not exist and clean build dirs
 mkdir -p bin
