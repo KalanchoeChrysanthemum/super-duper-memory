@@ -1,11 +1,10 @@
-use std::process::{Command, Child};
-use std::{thread, time};
+use std::process::{Child, Command};
 
 use rand::Rng;
 
 fn spawn_child() -> Child {
     let child = Command::new("sleep")
-        .arg("10") 
+        .arg("10")
         .spawn()
         .expect("Failed to start child process");
 
@@ -15,16 +14,14 @@ fn spawn_child() -> Child {
         spawn_child();
     }
 
-
     child
-    
 }
 
 fn main() {
     // i had to use `ps --forest -e` to get most of these to show up
     // should in theory work for children of children
 
-    let num_procs = 10; 
+    let num_procs = 10;
 
     let mut children_procs = Vec::new();
 
