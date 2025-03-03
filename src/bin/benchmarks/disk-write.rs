@@ -1,6 +1,7 @@
 use rand::Rng;
 use std::{
-    fs::{create_dir_all, remove_dir_all, File}, io::Write
+    fs::{File, create_dir_all, remove_dir_all},
+    io::Write,
 };
 
 pub fn main() {
@@ -19,7 +20,7 @@ pub fn main() {
         Err(_) => {
             println!("oopsies could not create file");
             cleanup();
-            return ();// gotta be a better way to handle this buttttt
+            return (); // gotta be a better way to handle this buttttt
         }
     };
 
