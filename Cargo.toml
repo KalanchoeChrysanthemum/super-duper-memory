@@ -14,10 +14,6 @@ name = "main"
 path = "src/bin/main.rs"
 
 [[bin]]
-name = "disk"
-path = "src/bin/benchmarks/disk.rs"
-
-[[bin]]
 name = "memory"
 path = "src/bin/benchmarks/memory.rs"
 
@@ -28,6 +24,18 @@ path = "src/bin/benchmarks/time.rs"
 [[bin]]
 name = "cpu"
 path = "src/bin/benchmarks/cpu.rs"
+
+[[bin]]
+name = "gpu"
+path = "src/bin/benchmarks/gpu.rs"
+
+[[bin]]
+name = "disk-read"
+path = "src/bin/benchmarks/disk-read.rs"
+
+[[bin]]
+name = "disk-write"
+path = "src/bin/benchmarks/disk-write.rs"
 
 
 [dependencies]
