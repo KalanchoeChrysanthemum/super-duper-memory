@@ -41,6 +41,10 @@ path = "src/bin/benchmarks/disk-write.rs"
 name = "child-procs"
 path = "src/bin/benchmarks/child-procs.rs"
 
+[[bin]]
+name = "sys-calls"
+path = "src/bin/benchmarks/sys-calls.rs"
+
 
 [dependencies]
 getopts = "0.2"
