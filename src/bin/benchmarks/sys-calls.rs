@@ -1,10 +1,8 @@
-use std::fs::{self, File, OpenOptions};
+use std::fs::{self, OpenOptions};
 use std::io::{Read, Write};
 use std::thread;
-use std::time::Duration;
 
 fn main() {
-
     // run with `strace -o tmp.txt ./bin/sys-calls` to view actual syscalls
 
     let path = "testfile.txt";
@@ -37,8 +35,6 @@ fn main() {
         })
         .collect();
 
-
-    
     for handle in join_handlers {
         handle.join().unwrap();
     }
@@ -46,7 +42,6 @@ fn main() {
     cleanup(path);
 }
 
-
-fn cleanup(path: &str){
+fn cleanup(path: &str) {
     fs::remove_file(path).expect("could not delete dummy file");
 }
