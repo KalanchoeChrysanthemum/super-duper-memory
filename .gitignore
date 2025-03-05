@@ -1,1 +1,8 @@
 /target
+
+# benchmark executables dirs
+/build-tmp
+/bin
+
+# dummy file for testing output
+tmp.txt
