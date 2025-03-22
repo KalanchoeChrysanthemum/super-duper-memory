@@ -2,7 +2,7 @@
 pub mod configurator {
     
     use getopts::{Matches, Options};
-    use std::{env, error::Error};
+    use std::{env, error::Error, fs, path::{self, PathBuf}};
     
     // eventually wanna be able to serialize this
     // right now these are just bools for "should_run", but can evntually be xpanded into full config types
@@ -17,14 +17,21 @@ pub mod configurator {
         gpu: bool,
         processes: bool,
         sys: bool,
-        exe_path: String
+        exe_path: PathBuf
     }
     
     
     
+    fn path_resolve(path: &str) -> Result<PathBuf, Box<dyn Error>> {
+        let src = PathBuf::from(path);
+
+        Ok(fs::canonicalize(src)?)
+    }
+
     pub fn build_config(flags: Matches) -> Result<Config, Box<dyn Error>> {
 
-        let exe_path = flags.opt_get("exe")?.ok_or_else(|| "Could not get executable path")?;
+        let exe_path: String = flags.opt_get("exe")?.ok_or_else(|| String::from("Could not get executable path"))?;
+        let full_exe_path = path_resolve(&exe_path)?;
         
         // will need to modify this logic once config gets more complex
         Ok(Config {
@@ -36,7 +43,7 @@ pub mod configurator {
             gpu: flags.opt_present("gpu"),
             processes: flags.opt_present("processes"),
             sys: flags.opt_present("sys"),
-            exe_path: exe_path,
+            exe_path: full_exe_path,
         })
     }
     
@@ -64,6 +71,9 @@ pub mod configurator {
         flags.optflag("p", "processes", "something children processes?");
         flags.optflag("s", "sys", "Track all syscalls");
         flags.optflag("f", "full", "Benchmark everything");
+
+        // always need executable path
+        flags.reqopt("e", "exe", "Path to executable", "EXE_FILE");
     }
     
     

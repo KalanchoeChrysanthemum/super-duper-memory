@@ -1,3 +1,3 @@
-#!/usr/bin/env bash
-cargo run --bin main
+#!/bin/bash
+cargo run --bin main -- $@
 
