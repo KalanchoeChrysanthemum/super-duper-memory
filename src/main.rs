@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{borrow::BorrowMut, error::Error, process::Command};
 
 use configurator::configurator::{build_config, parse_args};
 use getopts::Matches;
@@ -15,6 +15,7 @@ fn main() -> Result<(), Box<dyn Error>>{
     let conf = build_config(flags);
 
     println!("{:?}", conf);
+            
 
     Ok(())
 }
