@@ -15,7 +15,6 @@ fn main() -> Result<(), Box<dyn Error>>{
     let conf = build_config(flags);
 
     println!("{:?}", conf);
-            
-
+    
     Ok(())
 }
