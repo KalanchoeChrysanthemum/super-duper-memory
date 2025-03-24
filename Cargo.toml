@@ -9,9 +9,11 @@ edition = "2024"
 # which will eventually be some actual build command to a separate build dir from a script, that we can then 
 # call from another script.
 
+
+# this one has to be in the root directory to make the modules work as properly
 [[bin]]
 name = "main"
-path = "src/bin/main.rs"
+path = "src/main.rs"
 
 [[bin]]
 name = "memory"
