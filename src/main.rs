@@ -22,12 +22,14 @@
 
 
 
-use getopts::Options;
+use getopts::Matches;
 use colored::{ColoredString, Colorize};
+use configurator::configurator::{build_config, parse_args};
 
-use std::env;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::OnceLock;
+use std::sync::atomic::{AtomicBool, Ordering};
+
+mod configurator;
 
 
 // Flag for printing debug info
@@ -78,24 +80,12 @@ macro_rules! vprintln {
 
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let _prog = &args[0]; // Can be removed?
+    let flags: Matches = parse_args().unwrap();
+    let config = build_config(flags).unwrap();
 
-    let mut flags = Options::new();
-    set_flags(&mut flags);
-
-    let matches = match flags.parse(&args[1..]) {
-        Ok(o) => o,
-        Err(e) => {
-            // Unconditionally print error message
-            println!("[ERROR] {}", e.to_string());
-            std::process::exit(1);
-        }
-    };
 
     // Process verbose flag first
-    let verbose_flag = matches.opt_present("v");
-    VERBOSE.set(AtomicBool::new(verbose_flag)).unwrap();
+    VERBOSE.set(AtomicBool::new(config.verbose)).unwrap();
     vprintln!(LogType::INFO, "Verbose flag has been set");
     
     // Temporariy, can be removed
@@ -104,60 +94,43 @@ fn main() {
     vprintln!(LogType::WARN, "Test warn");
     vprintln!(LogType::ERROR, "Test error");
 
-    // For testing, can be removed
-    if matches.opt_present("test") {
-        if let Some(put) = matches.opt_str("test") {
-            temp_test(&put);
-        } else {
-            eprintln!("[ERROR] --test flag requires an argument.");
-        }
-    }
-
 
     // Processing flags passed
     //
     // Surely there's a better way...
-    if matches.opt_present("c") {
+    if config.cpu {
         bench_cpu();
     }
 
-    if matches.opt_present("d") {
+    if config.disk {
         bench_disk(); 
     }
 
-    if matches.opt_present("f") {
-        vprintln!(LogType::INFO, "Running full benchmark...");
-    }
-
-    if matches.opt_present("g") {
+    if config.gpu {
         bench_gpu();
     }
 
-    if matches.opt_present("m") {
+    if config.memory {
         bench_mem();
     }
 
-    if matches.opt_present("p") {
+    if config.processes {
         bench_processes();
     }
 
-    if matches.opt_present("r") {
+    if config.ram {
         bench_ram();
     }
 
-    if matches.opt_present("s") {
+    if config.sys {
         bench_calls();
     }
 
-    if matches.opt_present("t") {
+    if config.time {
         bench_time();
     }
 }
 
-
-fn temp_test(arg: &str) {
-    vprintln!(LogType::INFO, "Test ran with: {}", arg);
-}
 
 fn bench_cpu() {
     vprintln!(LogType::INFO, "Running CPU benchmark");
@@ -198,19 +171,3 @@ fn bench_time() {
     vprintln!(LogType::INFO, "Running time benchmark");
 }
 
-
-fn set_flags(flags: &mut Options) {
-    flags.optflag("c", "cpu", "Benchmarks CPU usage");
-    flags.optflag("d", "disk", "Benchmarks disk usage");
-    flags.optflag("f", "full", "Benchmark everything");
-    flags.optflag("g", "gpu", "Benchmarks GPU usage");
-    flags.optflag("m", "memory", "Benchmarks memory");
-    flags.optflag("p", "processes", "Benchmark child processes");
-    flags.optflag("r", "ram", "Benchmarks RAM usage");
-    flags.optflag("s", "sys", "Track all syscalls");
-    flags.optflag("t", "time", "Benchmarks time");
-    flags.optflag("v", "verbose", "Print debug info");
-
-    // Temp flag for testing
-    flags.optopt("", "test", "Temporary test mode", "EXE");
-}

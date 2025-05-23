@@ -10,7 +10,7 @@ edition = "2021"
 # call from another script.
 [[bin]]
 name = "main"
-path = "src/bin/main.rs"
+path = "src/main.rs"
 
 [[bin]]
 name = "memory"
