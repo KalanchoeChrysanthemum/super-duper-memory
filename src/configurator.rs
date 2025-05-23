@@ -1,23 +1,23 @@
-
 pub mod configurator {
     
     use getopts::{Matches, Options};
-    use std::{env, error::Error, fs, path::{self, PathBuf}};
+    use std::{env, error::Error, fs, path::PathBuf};
     
     // eventually wanna be able to serialize this
     // right now these are just bools for "should_run", but can evntually be xpanded into full config types
 
     #[derive(Debug)]
     pub struct Config {
-        time: bool,
-        memory: bool,
-        disk: bool,
-        ram: bool,
-        cpu: bool,
-        gpu: bool,
-        processes: bool,
-        sys: bool,
-        exe_path: PathBuf
+        pub time: bool,
+        pub memory: bool,
+        pub disk: bool,
+        pub ram: bool,
+        pub cpu: bool,
+        pub gpu: bool,
+        pub processes: bool,
+        pub sys: bool,
+        pub verbose: bool,
+        pub exe_path: PathBuf
     }
     
     
@@ -43,6 +43,7 @@ pub mod configurator {
             gpu: flags.opt_present("gpu"),
             processes: flags.opt_present("processes"),
             sys: flags.opt_present("sys"),
+            verbose: flags.opt_present("verbose"),
             exe_path: full_exe_path,
         })
     }
@@ -61,20 +62,22 @@ pub mod configurator {
     }
     
     
-    fn set_flags(flags: &mut Options) {        
-        flags.optflag("t", "time", "Benchmarks time");
-        flags.optflag("m", "memory", "Benchmarks memory");
-        flags.optflag("d", "disk", "Benchmarks disk usage");
-        flags.optflag("r", "ram", "Benchmarks RAM usage");
-        flags.optflag("c", "cpu", "Benchmarks CPU usage");
-        flags.optflag("g", "gpu", "Benchmarks GPU usage");
-        flags.optflag("p", "processes", "something children processes?");
-        flags.optflag("s", "sys", "Track all syscalls");
-        flags.optflag("f", "full", "Benchmark everything");
+fn set_flags(flags: &mut Options) {
+    flags.optflag("c", "cpu", "Benchmarks CPU usage");
+    flags.optflag("d", "disk", "Benchmarks disk usage");
+    flags.reqopt("e", "exe", "Path to executable", "EXE_FILE");
+    flags.optflag("f", "full", "Benchmark everything");
+    flags.optflag("g", "gpu", "Benchmarks GPU usage");
+    flags.optflag("m", "memory", "Benchmarks memory");
+    flags.optflag("p", "processes", "Benchmark child processes");
+    flags.optflag("r", "ram", "Benchmarks RAM usage");
+    flags.optflag("s", "sys", "Track all syscalls");
+    flags.optflag("t", "time", "Benchmarks time");
+    flags.optflag("v", "verbose", "Print debug info");
 
-        // always need executable path
-        flags.reqopt("e", "exe", "Path to executable", "EXE_FILE");
-    }
+    // Temp flag for testing
+    flags.optopt("", "test", "Temporary test mode", "EXE");
+}
     
     
 }
