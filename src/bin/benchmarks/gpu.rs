@@ -6,8 +6,8 @@
 // Zed => ?
 // nvim => ?
 
-use wgpu::*;
 use pollster;
+use wgpu::*;
 
 // most of this code is ripped from other places, I just cranked up some of the numbers
 // it basically freezes my system for a few seconds
@@ -15,15 +15,14 @@ use pollster;
 
 #[cfg(feature = "gpu")]
 fn main() {
-
     println!("Running GPU benchmark...");
 
     let instance = Instance::default();
     let adapter = pollster::block_on(instance.request_adapter(&RequestAdapterOptions::default()))
         .expect("Failed to find a GPU adapter");
-    let (device, queue) = pollster::block_on(adapter.request_device(&DeviceDescriptor::default(), None))
-        .expect("Failed to create GPU device");
-
+    let (device, queue) =
+        pollster::block_on(adapter.request_device(&DeviceDescriptor::default(), None))
+            .expect("Failed to create GPU device");
 
     // usually this would be in another glsl file
     // but i really just want this in one binary
@@ -36,7 +35,7 @@ fn main() {
             var value: u32 = buffer[index];
 
             // Heavy computation loop
-            for (var i = 0u; i < 50000000u; i++) { 
+            for (var i = 0u; i < 50000000u; i++) {
                 value = (value * 1664525u + 1013904223u) ^ (value >> 5);
                 if (i % 1024u == 0u) {
                     buffer[index] = value; // Force global memory writes
@@ -85,7 +84,7 @@ fn main() {
         layout: Some(&pipeline_layout),
         module: &shader,
         entry_point: Some("main"),
-        compilation_options: PipelineCompilationOptions::default(), 
+        compilation_options: PipelineCompilationOptions::default(),
         cache: None,
     });
 
@@ -110,7 +109,7 @@ fn main() {
         compute_pass.set_pipeline(&compute_pipeline);
         compute_pass.set_bind_group(0, &bind_group, &[]);
         // huge workload
-        compute_pass.dispatch_workgroups(16384, 1, 1); 
+        compute_pass.dispatch_workgroups(16384, 1, 1);
     }
 
     queue.submit(Some(encoder.finish()));

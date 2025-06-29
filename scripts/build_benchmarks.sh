@@ -7,7 +7,7 @@ usage(){
     echo "./scripts/build_benchmarks.sh [FLAGS]"
     echo "    [--no-gpu] Exclude GPU benchmark from compilation. Shaves off about several of compile time"
     echo "    [--help] print this menu"
-}   
+}
 
 build_and_cp_exe(){
     CUR="$1"
@@ -23,17 +23,17 @@ build_and_cp_exe(){
     # bc the wgpu is in the dependency tree for the cargo toml
     if [[ "$CUR" == "gpu" && "$EXCLUDE_GPU" == "true" ]]; then
         echo "Skipping GPU benchmark compilation..."
-        return 0  
+        return 0
     fi
 
     # this target build dir has to be unique for this to run in parallel
     TMP_TARGET="${CUR}-build"
     mkdir -p "build-tmp/${TMP_TARGET}"
 
-    # this does *not* compile them all mains in parallel, but compiles 
+    # this does *not* compile them all mains in parallel, but compiles
     # each main itself (mostly its dependencies) in parallel, so it
-    # should be proportional to the number of mains we have 
-    # NUM_WORKERS=$(ls src/bin/benchmarks | wc -l) 
+    # should be proportional to the number of mains we have
+    # NUM_WORKERS=$(ls src/bin/benchmarks | wc -l)
     # NUM_WORKERS=$(nproc)
 
     echo "Compiling ${CUR}..."
@@ -45,14 +45,14 @@ build_and_cp_exe(){
         cargo build -j $(nproc) --release --target-dir "build-tmp/${TMP_TARGET}" --bin "${CUR}"
     fi
 
-    
+
     mv "build-tmp/${TMP_TARGET}/release/${CUR}" bin
 
 
-    rm -rf "build-tmp/${TMP_TARGET}"  
+    rm -rf "build-tmp/${TMP_TARGET}"
 }
 
-if [[ "$1" == "--help" ]]; then 
+if [[ "$1" == "--help" ]]; then
     usage
     exit 0
 fi
@@ -77,7 +77,7 @@ rm -rf build-tmp/*
 for file in src/bin/benchmarks/*; do
 
     filename=$(basename "$file")
-    
+
     exe_name="${filename%.*}"
 
     echo "Found executable: $exe_name"
@@ -89,4 +89,3 @@ done
 wait
 
 rm -rf build-tmp
-
