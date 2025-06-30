@@ -149,6 +149,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         thread::sleep(time_between_snaps);
     }
 
+    //./run.sh bin/cpu --full intended usage
+
     println!("{:?}", snaps);
 
     Ok(())

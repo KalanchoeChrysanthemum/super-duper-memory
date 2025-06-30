@@ -22,7 +22,6 @@ pub mod configurator {
 
     fn path_resolve(path: &str) -> Result<PathBuf, Box<dyn Error>> {
         let src = PathBuf::from(path);
-
         Ok(fs::canonicalize(src)?)
     }
 
@@ -30,6 +29,7 @@ pub mod configurator {
         let exe_path: String = flags
             .opt_get("exe")?
             .ok_or_else(|| String::from("Could not get executable path"))?;
+
         let full_exe_path = path_resolve(&exe_path)?;
 
         let full = flags.opt_present("full");
