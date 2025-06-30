@@ -19,22 +19,17 @@
 //
 // Add graphing functionality to view results
 
-
-
-
-use getopts::Matches;
 use colored::{ColoredString, Colorize};
 use configurator::configurator::{build_config, parse_args};
+use getopts::Matches;
 
-use std::sync::OnceLock;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::OnceLock;
 
 mod configurator;
 
-
 // Flag for printing debug info
 static VERBOSE: OnceLock<AtomicBool> = OnceLock::new();
-
 
 #[allow(dead_code)]
 enum LogType {
@@ -60,7 +55,6 @@ fn is_verbose() -> bool {
         .unwrap_or(false)
 }
 
-
 //==============================
 //          MACROS
 //==============================
@@ -78,22 +72,19 @@ macro_rules! vprintln {
 //         END MACROS
 //==============================
 
-
 fn main() {
     let flags: Matches = parse_args().unwrap();
     let config = build_config(flags).unwrap();
 
-
     // Process verbose flag first
     VERBOSE.set(AtomicBool::new(config.verbose)).unwrap();
     vprintln!(LogType::INFO, "Verbose flag has been set");
-    
+
     // Temporariy, can be removed
     vprintln!(LogType::INFO, "Testing logging...");
     vprintln!(LogType::INFO, "Test info");
     vprintln!(LogType::WARN, "Test warn");
     vprintln!(LogType::ERROR, "Test error");
-
 
     // Processing flags passed
     //
@@ -103,7 +94,7 @@ fn main() {
     }
 
     if config.disk {
-        bench_disk(); 
+        bench_disk();
     }
 
     if config.gpu {
@@ -129,45 +120,60 @@ fn main() {
     if config.time {
         bench_time();
     }
-}
 
+    let mut sys = sysinfo::System::new_all();
+
+    sys.refresh_memory();
+
+    let user_sys = UserSystem {
+        total_memory_in_gb: sys.total_memory() as f64 / (1024.0 * 1024.0),
+    };
+
+    let mut snaps: Vec<Snap> = vec![];
+    let exe_is_done = Arc::new(AtomicBool::new(false));
+
+    run_exe_in_bg(conf.exe_path, &exe_is_done);
+
+    let time_between_snaps = Duration::from_millis(300);
+
+    while !exe_is_done.load(std::sync::atomic::Ordering::SeqCst) {
+        snaps.push(Snap::new(&mut sys));
+        thread::sleep(time_between_snaps);
+    }
+
+    println!("{:?}", snaps);
+
+    Ok(())
+}
 
 fn bench_cpu() {
     vprintln!(LogType::INFO, "Running CPU benchmark");
 }
 
-
 fn bench_disk() {
     vprintln!(LogType::INFO, "Running DISK benchmark");
 }
-
 
 fn bench_gpu() {
     vprintln!(LogType::INFO, "Running GPU benchmark");
 }
 
-
 fn bench_mem() {
     vprintln!(LogType::INFO, "Running memory benchmark");
 }
-
 
 fn bench_processes() {
     vprintln!(LogType::INFO, "Running processes benchmark");
 }
 
-
 fn bench_ram() {
     vprintln!(LogType::INFO, "Running RAM benchmark");
 }
-
 
 fn bench_calls() {
     vprintln!(LogType::INFO, "Running syscalls benchmark");
 }
 
-
 fn bench_time() {
     vprintln!(LogType::INFO, "Running time benchmark");
 }
-
