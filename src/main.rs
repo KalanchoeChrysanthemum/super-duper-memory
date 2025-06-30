@@ -23,8 +23,13 @@ use colored::{ColoredString, Colorize};
 use configurator::configurator::{build_config, parse_args};
 use getopts::Matches;
 
+use std::error::Error;
+use std::path::PathBuf;
+use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
+use std::thread;
+use std::time::Duration;
 
 mod configurator;
 
@@ -72,12 +77,12 @@ macro_rules! vprintln {
 //         END MACROS
 //==============================
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     let flags: Matches = parse_args().unwrap();
-    let config = build_config(flags).unwrap();
+    let conf = build_config(flags).unwrap();
 
     // Process verbose flag first
-    VERBOSE.set(AtomicBool::new(config.verbose)).unwrap();
+    VERBOSE.set(AtomicBool::new(conf.verbose)).unwrap();
     vprintln!(LogType::INFO, "Verbose flag has been set");
 
     // Temporariy, can be removed
@@ -89,35 +94,35 @@ fn main() {
     // Processing flags passed
     //
     // Surely there's a better way...
-    if config.cpu {
+    if conf.cpu {
         bench_cpu();
     }
 
-    if config.disk {
+    if conf.disk {
         bench_disk();
     }
 
-    if config.gpu {
+    if conf.gpu {
         bench_gpu();
     }
 
-    if config.memory {
+    if conf.memory {
         bench_mem();
     }
 
-    if config.processes {
+    if conf.processes {
         bench_processes();
     }
 
-    if config.ram {
+    if conf.ram {
         bench_ram();
     }
 
-    if config.sys {
+    if conf.sys {
         bench_calls();
     }
 
-    if config.time {
+    if conf.time {
         bench_time();
     }
 
@@ -144,6 +149,29 @@ fn main() {
     println!("{:?}", snaps);
 
     Ok(())
+}
+
+// system taken by lib
+pub struct UserSystem {
+    total_memory_in_gb: f64,
+}
+
+// uses system to run proc, but ignore results, updates atomic bool
+fn run_exe_in_bg(exe: PathBuf, done_flag: &Arc<AtomicBool>) {
+    if let Ok(mut child) = Command::new(exe)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+    // uhh new scope
+    {
+        // I think this clone is fine ;-;
+        let done_flag = Arc::clone(done_flag);
+        thread::spawn(move || {
+            let _ = child.wait();
+            done_flag.store(true, Ordering::SeqCst);
+        });
+    }
 }
 
 fn bench_cpu() {
