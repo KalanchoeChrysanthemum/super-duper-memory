@@ -32,17 +32,19 @@ pub mod configurator {
             .ok_or_else(|| String::from("Could not get executable path"))?;
         let full_exe_path = path_resolve(&exe_path)?;
 
+        let full = flags.opt_present("full");
+
         // will need to modify this logic once config gets more complex
         Ok(Config {
-            time: flags.opt_present("time"),
-            memory: flags.opt_present("memory"),
-            disk: flags.opt_present("disk"),
-            ram: flags.opt_present("ram"),
-            cpu: flags.opt_present("cpu"),
-            gpu: flags.opt_present("gpu"),
-            processes: flags.opt_present("processes"),
-            sys: flags.opt_present("sys"),
-            verbose: flags.opt_present("verbose"),
+            time: full || flags.opt_present("time"),
+            memory: full || flags.opt_present("memory"),
+            disk: full || flags.opt_present("disk"),
+            ram: full || flags.opt_present("ram"),
+            cpu: full || flags.opt_present("cpu"),
+            gpu: full || flags.opt_present("gpu"),
+            processes: full || flags.opt_present("processes"),
+            sys: full || flags.opt_present("sys"),
+            verbose: flags.opt_defined("verbose"),
             exe_path: full_exe_path,
         })
     }
