@@ -19,7 +19,9 @@
 //
 // Add graphing functionality to view results
 
-use charming::component::Axis;
+use charming::component::{Axis, Title};
+use charming::datatype::DataPoint;
+use charming::element::{AxisType, Tooltip};
 use charming::{component::Legend, element::ItemStyle, series::Line, Chart};
 use charming::{HtmlRenderer, ImageRenderer};
 
@@ -157,13 +159,37 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     println!("{:?}", snaps);
 
-    let chart = Chart::new()
-        .x_axis(Axis::new().data(snaps.iter().map(|s| s.time.to_string()).collect()))
-        .y_axis(Axis::new())
-        .series(Line::new().data(snaps.iter().map(|s| s.used_memory_in_gb).collect()));
+    // let chart = Chart::new()
+    //     .x_axis(Axis::new().data(snaps.iter().map(|s| s.time.to_string()).collect()))
+    //     .y_axis(Axis::new())
+    //     .series(Line::new().data(snaps.iter().map(|s| s.used_memory_in_gb).collect()));
+    //
 
-    let mut renderer = ImageRenderer::new(1000, 800);
-    renderer.save(&chart, "chart.svg")?;
+    let chart = Chart::new()
+        .title(Title::new().text("Memory Usage Over Time (GB)"))
+        .tooltip(Tooltip::new())
+        .legend(Legend::new())
+        .x_axis(
+            Axis::new()
+                .name("Time (ms)")
+                .type_(AxisType::Category)
+                .data(snaps.iter().map(|s| s.time.to_string()).collect()),
+        )
+        .y_axis(Axis::new().name("Memory (GB)").type_(AxisType::Value))
+        .series(
+            Line::new()
+                .name("Used Memory")
+                .smooth(true)
+                // .area_style(ItemStyle::new().color("rgba(255, 99, 132, 0.4)"))
+                .item_style(ItemStyle::new().color("rgb(255, 99, 132)"))
+                .data::<DataPoint>(snaps.iter().map(|s| s.used_memory_in_gb.into()).collect()),
+        );
+    // let mut renderer = ImageRenderer::new(1000, 800);
+    // renderer.save(&chart, "chart.svg")?;
+    //
+
+    let html = HtmlRenderer::new("Memory Chart", 800, 1000).render(&chart)?;
+    std::fs::write("chart.html", html)?;
 
     Ok(())
 }
