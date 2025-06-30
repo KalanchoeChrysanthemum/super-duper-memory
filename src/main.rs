@@ -31,7 +31,10 @@ use std::sync::{Arc, OnceLock};
 use std::thread;
 use std::time::Duration;
 
+use crate::snap::Snap;
+
 mod configurator;
+mod snap;
 
 // Flag for printing debug info
 static VERBOSE: OnceLock<AtomicBool> = OnceLock::new();

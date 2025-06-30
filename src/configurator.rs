@@ -1,8 +1,8 @@
 pub mod configurator {
-    
+
     use getopts::{Matches, Options};
     use std::{env, error::Error, fs, path::PathBuf};
-    
+
     // eventually wanna be able to serialize this
     // right now these are just bools for "should_run", but can evntually be xpanded into full config types
 
@@ -17,11 +17,9 @@ pub mod configurator {
         pub processes: bool,
         pub sys: bool,
         pub verbose: bool,
-        pub exe_path: PathBuf
+        pub exe_path: PathBuf,
     }
-    
-    
-    
+
     fn path_resolve(path: &str) -> Result<PathBuf, Box<dyn Error>> {
         let src = PathBuf::from(path);
 
@@ -29,10 +27,11 @@ pub mod configurator {
     }
 
     pub fn build_config(flags: Matches) -> Result<Config, Box<dyn Error>> {
-
-        let exe_path: String = flags.opt_get("exe")?.ok_or_else(|| String::from("Could not get executable path"))?;
+        let exe_path: String = flags
+            .opt_get("exe")?
+            .ok_or_else(|| String::from("Could not get executable path"))?;
         let full_exe_path = path_resolve(&exe_path)?;
-        
+
         // will need to modify this logic once config gets more complex
         Ok(Config {
             time: flags.opt_present("time"),
@@ -47,37 +46,33 @@ pub mod configurator {
             exe_path: full_exe_path,
         })
     }
-    
-    
-    pub fn parse_args() -> Result<getopts::Matches ,Box<dyn Error>> {
+
+    pub fn parse_args() -> Result<getopts::Matches, Box<dyn Error>> {
         let args: Vec<String> = env::args().collect();
         let ref _prog = args[0];
-        
+
         let mut flags = Options::new();
         set_flags(&mut flags);
 
         let opts = flags.parse(&args[1..])?;
-        
+
         Ok(opts)
     }
-    
-    
-fn set_flags(flags: &mut Options) {
-    flags.optflag("c", "cpu", "Benchmarks CPU usage");
-    flags.optflag("d", "disk", "Benchmarks disk usage");
-    flags.reqopt("e", "exe", "Path to executable", "EXE_FILE");
-    flags.optflag("f", "full", "Benchmark everything");
-    flags.optflag("g", "gpu", "Benchmarks GPU usage");
-    flags.optflag("m", "memory", "Benchmarks memory");
-    flags.optflag("p", "processes", "Benchmark child processes");
-    flags.optflag("r", "ram", "Benchmarks RAM usage");
-    flags.optflag("s", "sys", "Track all syscalls");
-    flags.optflag("t", "time", "Benchmarks time");
-    flags.optflag("v", "verbose", "Print debug info");
 
-    // Temp flag for testing
-    flags.optopt("", "test", "Temporary test mode", "EXE");
-}
-    
-    
+    fn set_flags(flags: &mut Options) {
+        flags.optflag("c", "cpu", "Benchmarks CPU usage");
+        flags.optflag("d", "disk", "Benchmarks disk usage");
+        flags.reqopt("e", "exe", "Path to executable", "EXE_FILE");
+        flags.optflag("f", "full", "Benchmark everything");
+        flags.optflag("g", "gpu", "Benchmarks GPU usage");
+        flags.optflag("m", "memory", "Benchmarks memory");
+        flags.optflag("p", "processes", "Benchmark child processes");
+        flags.optflag("r", "ram", "Benchmarks RAM usage");
+        flags.optflag("s", "sys", "Track all syscalls");
+        flags.optflag("t", "time", "Benchmarks time");
+        flags.optflag("v", "verbose", "Print debug info");
+
+        // Temp flag for testing
+        flags.optopt("", "test", "Temporary test mode", "EXE");
+    }
 }
