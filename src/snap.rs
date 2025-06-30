@@ -4,8 +4,8 @@ use sysinfo::System;
 // snapshots of system usage at point in time
 #[derive(Debug, Clone, Copy)]
 pub struct Snap {
-    time: chrono::DateTime<Utc>,
-    used_memory_in_gb: f64,
+    pub time: chrono::DateTime<Utc>,
+    pub used_memory_in_gb: f64,
 }
 
 impl Snap {

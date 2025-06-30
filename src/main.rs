@@ -19,6 +19,10 @@
 //
 // Add graphing functionality to view results
 
+use charming::component::Axis;
+use charming::{component::Legend, element::ItemStyle, series::Line, Chart};
+use charming::{HtmlRenderer, ImageRenderer};
+
 use colored::{ColoredString, Colorize};
 use configurator::configurator::{build_config, parse_args};
 use getopts::Matches;
@@ -152,6 +156,14 @@ fn main() -> Result<(), Box<dyn Error>> {
     //./run.sh bin/cpu --full intended usage
 
     println!("{:?}", snaps);
+
+    let chart = Chart::new()
+        .x_axis(Axis::new().data(snaps.iter().map(|s| s.time.to_string()).collect()))
+        .y_axis(Axis::new())
+        .series(Line::new().data(snaps.iter().map(|s| s.used_memory_in_gb).collect()));
+
+    let mut renderer = ImageRenderer::new(1000, 800);
+    renderer.save(&chart, "chart.svg")?;
 
     Ok(())
 }
