@@ -19,22 +19,25 @@
 //
 // Add graphing functionality to view results
 
-
-
-
-use getopts::Matches;
 use colored::{ColoredString, Colorize};
 use configurator::configurator::{build_config, parse_args};
+use getopts::Matches;
 
-use std::sync::OnceLock;
+use std::error::Error;
+use std::path::PathBuf;
+use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, OnceLock};
+use std::thread;
+use std::time::Duration;
+
+use crate::snap::Snap;
 
 mod configurator;
-
+mod snap;
 
 // Flag for printing debug info
 static VERBOSE: OnceLock<AtomicBool> = OnceLock::new();
-
 
 #[allow(dead_code)]
 enum LogType {
@@ -60,7 +63,6 @@ fn is_verbose() -> bool {
         .unwrap_or(false)
 }
 
-
 //==============================
 //          MACROS
 //==============================
@@ -78,96 +80,133 @@ macro_rules! vprintln {
 //         END MACROS
 //==============================
 
-
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     let flags: Matches = parse_args().unwrap();
-    let config = build_config(flags).unwrap();
-
+    let conf = build_config(flags).unwrap();
 
     // Process verbose flag first
-    VERBOSE.set(AtomicBool::new(config.verbose)).unwrap();
+    VERBOSE.set(AtomicBool::new(conf.verbose)).unwrap();
     vprintln!(LogType::INFO, "Verbose flag has been set");
-    
+
     // Temporariy, can be removed
     vprintln!(LogType::INFO, "Testing logging...");
     vprintln!(LogType::INFO, "Test info");
     vprintln!(LogType::WARN, "Test warn");
     vprintln!(LogType::ERROR, "Test error");
 
-
     // Processing flags passed
     //
     // Surely there's a better way...
-    if config.cpu {
+    if conf.cpu {
         bench_cpu();
     }
 
-    if config.disk {
-        bench_disk(); 
+    if conf.disk {
+        bench_disk();
     }
 
-    if config.gpu {
+    if conf.gpu {
         bench_gpu();
     }
 
-    if config.memory {
+    if conf.memory {
         bench_mem();
     }
 
-    if config.processes {
+    if conf.processes {
         bench_processes();
     }
 
-    if config.ram {
+    if conf.ram {
         bench_ram();
     }
 
-    if config.sys {
+    if conf.sys {
         bench_calls();
     }
 
-    if config.time {
+    if conf.time {
         bench_time();
     }
+
+    let mut sys = sysinfo::System::new_all();
+
+    sys.refresh_memory();
+
+    let user_sys = UserSystem {
+        total_memory_in_gb: sys.total_memory() as f64 / (1024.0 * 1024.0),
+    };
+
+    let mut snaps: Vec<Snap> = vec![];
+    let exe_is_done = Arc::new(AtomicBool::new(false));
+
+    run_exe_in_bg(conf.exe_path, &exe_is_done);
+
+    let time_between_snaps = Duration::from_millis(300);
+
+    while !exe_is_done.load(std::sync::atomic::Ordering::SeqCst) {
+        snaps.push(Snap::new(&mut sys));
+        thread::sleep(time_between_snaps);
+    }
+
+    //./run.sh bin/cpu --full intended usage
+
+    println!("{:?}", snaps);
+
+    Ok(())
 }
 
+// system taken by lib
+pub struct UserSystem {
+    total_memory_in_gb: f64,
+}
+
+// uses system to run proc, but ignore results, updates atomic bool
+fn run_exe_in_bg(exe: PathBuf, done_flag: &Arc<AtomicBool>) {
+    if let Ok(mut child) = Command::new(exe)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+    // uhh new scope
+    {
+        // I think this clone is fine ;-;
+        let done_flag = Arc::clone(done_flag);
+        thread::spawn(move || {
+            let _ = child.wait();
+            done_flag.store(true, Ordering::SeqCst);
+        });
+    }
+}
 
 fn bench_cpu() {
     vprintln!(LogType::INFO, "Running CPU benchmark");
 }
 
-
 fn bench_disk() {
     vprintln!(LogType::INFO, "Running DISK benchmark");
 }
-
 
 fn bench_gpu() {
     vprintln!(LogType::INFO, "Running GPU benchmark");
 }
 
-
 fn bench_mem() {
     vprintln!(LogType::INFO, "Running memory benchmark");
 }
-
 
 fn bench_processes() {
     vprintln!(LogType::INFO, "Running processes benchmark");
 }
 
-
 fn bench_ram() {
     vprintln!(LogType::INFO, "Running RAM benchmark");
 }
-
 
 fn bench_calls() {
     vprintln!(LogType::INFO, "Running syscalls benchmark");
 }
 
-
 fn bench_time() {
     vprintln!(LogType::INFO, "Running time benchmark");
 }
-
